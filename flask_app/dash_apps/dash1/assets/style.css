@@ -1,0 +1,97 @@
+.dash-debug-menu__outer,
+.dash-debug-menu {
+  visibility: hidden !important;
+}
+
+nav {
+  background-color: royalblue;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+nav a {
+  float: right;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 2px 10px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+nav a:hover {
+  background-color: darkslateblue;
+  color: #ddd;
+}
+
+/* Add a color to the active/current link */
+nav a.active {
+  background-color: royalblue;
+  color: white;
+}
+
+h2 {
+  color: #dddddd;
+  background-color: royalblue;
+  padding: 6px;
+  margin: 0px 0px;
+  text-align: center;
+}
+
+hr {
+  border: none;
+  height: 2px;
+  margin: 0px 0px;
+  background-color: #333333;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+.custom-checkbox .button {
+  display: inline-block;
+  padding: 5px;
+  margin: 2px;
+  background-color: darkgrey;
+  color: white;
+  font-size: 0.8rem;
+  border: 2px solid darkgrey;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 120px;
+  text-align: center;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.custom-checkbox .button:hover {
+  background-color: gray;
+}
+
+input[type="checkbox"]:checked + .button {
+  background-color: royalblue;
+  border-color: royalblue;
+  color: white;
+}
+
+input[type="checkbox"]:checked + .button:hover {
+  background-color: darkslateblue;
+}
+
+.rc-slider-mark-text {
+  transform: translateX(40%) !important;
+}
+
+.rc-slider-track {
+  background-color: royalblue;
+  transform: scaley(3);
+}
+
+.rc-slider-handle.rc-slider-handle-1,
+.rc-slider-handle.rc-slider-handle-2,
+.rc-slider-dragging {
+  background-color: royalblue;
+  transform: scale(2);
+}
