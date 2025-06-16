@@ -1,3 +1,6 @@
+from math import ceil
+
+import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Dash, Input, Output, dash_table, html
 from dash.dash_table.Format import Format, Group, Symbol
@@ -6,10 +9,15 @@ from flask import g
 
 def init_app(url_path, server=None):
     global df
-    global engine
-    engine = g.engine
+    global session
+    session = g.session
 
-    app = Dash(__name__, server=server, routes_pathname_prefix=url_path)
+    app = Dash(
+        __name__,
+        server=server,
+        routes_pathname_prefix=url_path,
+        external_stylesheets=[dbc.themes.BOOTSTRAP],
+    )
 
     PAGE_SIZE = 10
 
@@ -18,7 +26,7 @@ def init_app(url_path, server=None):
             [
                 html.A("Logout", href="/logout"),
                 html.A("Menu", href="/dash"),
-                html.A("Profile", href="/profile")
+                html.A("Profile", href="/profile"),
             ]
         ),
         html.H2("GapMinder 2025"),
@@ -47,7 +55,11 @@ def init_app(url_path, server=None):
                 },
             ],
             style_cell_conditional=[
-                {"if": {"column_type": "text"}, "textAlign": "left"}
+                {
+                    "if": {"column_type": "text"},
+                    "textAlign": "left",
+                    "paddingLeft": "10px",
+                }
             ],
             style_data_conditional=[
                 {
@@ -64,6 +76,10 @@ def init_app(url_path, server=None):
                 },
             ],
             style_as_list_view=True,
+            style_header={
+                "paddingRight": "10px",
+                "paddingLeft": "10px",
+            },
             page_current=0,
             page_size=PAGE_SIZE,
             page_action="custom",
@@ -135,7 +151,7 @@ def update_table(page_current, page_size, sort_by, filter):
         sorting_parts = [col["column_id"] + " " + col["direction"] for col in sort_by]
         sorting = " order by " + ", ".join(sorting_parts)
 
-    query = (
+    data_query = (
         "select country, population, life_exp, gdp_percap from gapminder"
         + query_filter
         + sorting
@@ -145,15 +161,21 @@ def update_table(page_current, page_size, sort_by, filter):
         + str(page_size)
     )
 
-    with engine.connect() as conn, conn.begin():
-        df = pd.read_sql_query(query, conn)
+    count_query = "select count(id) from gapminder" + query_filter
 
-    return df.to_dict("records")
+    records_count = 0
+    with session.connection() as conn:
+        df = pd.read_sql_query(data_query, conn)
+        records_count = pd.read_sql_query(count_query, conn)
+
+    page_count = ceil(records_count.iloc[0, 0] / page_size)
+    return df.to_dict("records"), page_count
 
 
 def init_callbacks(app):
     app.callback(
         Output("table-sorting-filtering", "data"),
+        Output("table-sorting-filtering", "page_count"),
         Input("table-sorting-filtering", "page_current"),
         Input("table-sorting-filtering", "page_size"),
         Input("table-sorting-filtering", "sort_by"),

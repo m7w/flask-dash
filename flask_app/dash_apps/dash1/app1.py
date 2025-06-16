@@ -147,7 +147,7 @@ def create_trend_graph():
     return figure
 
 
-def create_category_product_bar(customers, cities, date_range):
+def create_category_product_bars(customers, cities, date_range):
     if customers is None or cities is None:
         return {}
 
@@ -204,19 +204,11 @@ def create_category_product_bar(customers, cities, date_range):
     return c_figure, p_figure
 
 
-def update_output(value):
-    return 'You have selected "{} - {}"'.format(dates[value[0]], dates[value[1]])
-
-
 def init_callbacks(app):
-    app.callback(
-        Output("output-slider", "children"), Input("date-range-slider", "value")
-    )(update_output)
-
     app.callback(
         Output("category-bar", "figure"),
         Output("product-bar", "figure"),
         Input("customer-checklist", "value"),
         Input("city-checklist", "value"),
         Input("date-range-slider", "value"),
-    )(create_category_product_bar)
+    )(create_category_product_bars)

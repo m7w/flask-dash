@@ -4,6 +4,7 @@ from flask_security.decorators import auth_required
 
 main = Blueprint("main", __name__)
 
+
 @main.route("/")
 def home():
     return redirect(url_for("main.dashboards"))
@@ -18,8 +19,9 @@ def dashboards():
 @main.route("/profile")
 @auth_required()
 def profile():
+    last_login_at = current_user.last_login_at.strftime("%Y-%m-%d %H:%M:%S")
     return render_template(
         "profile.html",
         name=current_user.username,
-        last_login=current_user.last_login_at,
+        last_login=last_login_at,
     )
