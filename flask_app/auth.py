@@ -1,6 +1,13 @@
 from datetime import datetime
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_user, logout_user
 
 from . import security
@@ -8,7 +15,7 @@ from .database import db_session
 
 auth = Blueprint("auth", __name__)
 
-@auth.before_request
+@auth.before_app_request
 def require_login():
     if request.endpoint in ["auth.login"]:
         return
@@ -34,7 +41,9 @@ def login():
         user.current_login_at = datetime.now()
         db_session.merge(user)
         db_session.commit()
-        return redirect(url_for("main.dashboards"))
+        response = make_response(redirect(url_for("main.dashboards")))
+        response.set_cookie("permissions", ",".join(user.get_permissions()))
+        return response
     return render_template("login.html")
 
 

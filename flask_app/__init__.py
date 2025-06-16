@@ -9,7 +9,8 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from .dash_apps.dash1 import app1
 from .dash_apps.dash2 import app2
-from .database import db_session, engine, init_db
+from .dash_apps.dash3 import app3
+from .database import db_session, init_db
 from .models import Role, User
 
 app = Flask(__name__)
@@ -52,7 +53,7 @@ with app.app_context():
             password=hash_password("password"),
             roles=["editor"],
         )
-    if not security.datastore.find_user(username="editor"):
+    if not security.datastore.find_user(username="reader"):
         security.datastore.create_user(
             email="reader",
             username="reader",
@@ -61,12 +62,13 @@ with app.app_context():
         )
     db_session.commit()
 
-    g.engine = engine
+    g.session = db_session
     dash_app = DispatcherMiddleware(
         app,
         {
             "/dash1": app1.init_app("/dash1/", app),
             "/dash2": app2.init_app("/dash2/", app),
+            "/dash3": app3.init_app("/dash3/", app),
         },
     )
 
